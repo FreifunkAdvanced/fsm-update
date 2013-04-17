@@ -1,5 +1,17 @@
-Tbl=/tmp/p2ptbl/update
-TblIf=br-mesh
+#Netifd version by CyrusFox alias lcb01
+SO=$1
+SN=$2
+interface=$3
+
+get_iface () {
+	local iface=$(uci get network.$interface.ifname)
+	local type=$(uci get network.$interface.type)
+	[ "bridge" = "$type" ] && iface="br-$interface"
+	echo $iface
+}
+
+Tbl=/var/p2ptbl/$interface/update
+TblIf=$(get_iface)
 FwDir=/tmp/firmware
 
 # updates global state using current internal state; implicit
@@ -11,7 +23,7 @@ GS_update () {
 # assemble internal state
 CurState=$1
 CurTime=$(date +%s)
-NodeId=$(cat /proc/sys/kernel/random/boot_id) # TODO: replace with stable machine id
+NodeId=$(cat /etc/nodeid) # TODO: replace with stable machine id
 CurFw="$(cat /etc/firmware)"
 [ -n "$NodeId" -a -n "$CurFw" ]
 
